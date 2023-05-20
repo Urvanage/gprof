@@ -168,7 +168,7 @@ void count_total(long long int* total, MAP *m){
     return;
 }
 
-void solution(MAP *m){
+void solution(MAP *m,int* total){
 
     int len = getNfromMAP(m);
     init_visit(m);
