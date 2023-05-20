@@ -20,14 +20,15 @@ int getNfromMAP(MAP *m){
 }
 
 void allocate_arr(MAP *m){
-    m->map = (char**)malloc((getNfromMAP(m)+2)*sizeof(char*)); //getNfromMAP;
-    m->cst = (int**)malloc((getNfromMAP(m)+2)*sizeof(int*));
-    m->visit = (int**)malloc((getNfromMAP(m)+2)*sizeof(int*));
+    int len = getNfromMAP(m);
+    m->map = (char**)malloc((len+2)*sizeof(char*)); //getNfromMAP;
+    m->cst = (int**)malloc((len+2)*sizeof(int*));
+    m->visit = (int**)malloc((len+2)*sizeof(int*));
 
-    for(int i=0;i<getNfromMAP(m)+2;i++){
-        m->map[i] = (char*)malloc((getNfromMAP(m)+2)*sizeof(char));
-        m->cst[i] = (int*)malloc((getNfromMAP(m)+2)*sizeof(int));
-        m->visit[i] = (int*)malloc((getNfromMAP(m)+2)*sizeof(int));
+    for(int i=0;i<len+2;i++){
+        m->map[i] = (char*)malloc((len+2)*sizeof(char));
+        m->cst[i] = (int*)malloc((len+2)*sizeof(int));
+        m->visit[i] = (int*)malloc((len+2)*sizeof(int));
     }
 }
 
@@ -50,9 +51,10 @@ int chooseint(){
 }
 
 void init_arr(MAP* m){
-    for(int i=1;i<=getNfromMAP(m)+1;i++){
-        for(int j=1;j<=getNfromMAP(m)+1;j++){
-            if(i<=getNfromMAP(m) && j<=getNfromMAP(m)){
+    int len = getNfromMAP(m);
+    for(int i=1;i<=len+1;i++){
+        for(int j=1;j<=len+1;j++){
+            if(i<=len&& j<=len){
                 m->map[i][j] = choosech();
                 m->cst[i][j] = 0;
             }
@@ -66,8 +68,8 @@ void init_arr(MAP* m){
 }
 
 void free_arr(MAP* m){
-
-    for(int i=0;i<getNfromMAP(m)+2;i++){
+    int len=getNfromMAP(m);
+    for(int i=0;i<len+2;i++){
         free(m->map[i]);
         free(m->cst[i]);
         free(m->visit[i]);
@@ -95,6 +97,7 @@ void fill_random_map(MAP *m){
 }*/
 
 void update(int x,int y, int num, MAP *m){
+    int len = getNfromMAP(m);
     int nex, ney;
     if(m->map[x][y]=='R'){
         nex= x;
@@ -105,9 +108,9 @@ void update(int x,int y, int num, MAP *m){
         ney =y;
     }
     
-    if(1<=nex && nex<= getNfromMAP(m)+1 && 1<=ney && ney<= getNfromMAP(m)+1){
+    if(1<=nex && nex<= len+1 && 1<=ney && ney<= len+1){
         m->visit[nex][ney] += num;
-        if(nex==getNfromMAP(m)+1 || ney==getNfromMAP(m)+1){
+        if(nex==len+1 || ney==len+1){
             return;
         }
         else{
@@ -117,6 +120,7 @@ void update(int x,int y, int num, MAP *m){
 }
 
 void dfs(int x,int y, MAP *m){
+    int len = getNfromMAP(m);
     int nex,ney;
     if(m->map[x][y]=='R'){
         nex = x;
@@ -126,8 +130,8 @@ void dfs(int x,int y, MAP *m){
         nex = x+1;
         ney =y;
     }
-    if(1<=nex && nex<=getNfromMAP(m)+1 && 1<=ney && ney<=getNfromMAP(m)+1){
-        if(nex == getNfromMAP(m)+1 || ney == getNfromMAP(m)+1){
+    if(1<=nex && nex<=len+1 && 1<=ney && ney<=len+1){
+        if(nex == len+1 || ney == len+1){
             m->visit[nex][ney] = m->visit[x][y];
             return;
         }
@@ -145,29 +149,32 @@ void dfs(int x,int y, MAP *m){
 }
 
 void init_visit(MAP *m){
-    for(int i=0;i<getNfromMAP(m)+2;i++){
-        for(int j=0;j<getNfromMAP(m)+2;j++){
+    int len = getNfromMAP(m);
+    for(int i=0;i<len+2;i++){
+        for(int j=0;j<len+2;j++){
             m->visit[i][j] = 0;
         }
     }
 }
 
 void count_total(long long int* total, MAP *m){
-    for(int i=1;i<=getNfromMAP(m)+1;i++){
-        *total = *total + m->cst[i][getNfromMAP(m)+1]*m->visit[i][getNfromMAP(m)+1]; 
+    int len = getNfromMAP(m);
+    for(int i=1;i<=len+1;i++){
+        *total = *total + m->cst[i][len+1]*m->visit[i][len+1]; 
     }
-       for(int j=1;j<=getNfromMAP(m)+1;j++){
-        *total = *total + m->cst[getNfromMAP(m)+1][j]*m->visit[getNfromMAP(m)+1][j]; 
+    for(int j=1;j<=len+1;j++){
+        *total = *total + m->cst[len+1][j]*m->visit[len+1][j]; 
     }
     return;
 }
 
 void solution(MAP *m){
 
+    int len = getNfromMAP(m);
     init_visit(m);
 
-    for(int i=1;i<=getNfromMAP(m);i++){
-        for(int j=1;j<=getNfromMAP(m);j++){
+    for(int i=1;i<=len;i++){
+        for(int j=1;j<=len;j++){
             if(m->visit[i][j]==0){
                 m->visit[i][j]=1;
                 dfs(i,j,m);
@@ -191,16 +198,19 @@ void changedir(int x,int y,MAP *m){
 int main(){
     srand(time(NULL));
     MAP m;
+    long long int total = 0;
 
     fill_random_map(&m);
 
-    solution(&m);
+    solution(&m,&total);
 
-    int Q = chooseint();
+    int Q = chooseint()+200;
+
     for(int i=0;i<Q;i++){
-        int x,y; 
-        scanf("%d %d",&x,&y);
+        int x = chooseint()%m.n+1,y = chooseint()%m.n+1; 
         changedir(x,y,&m);
         solution(&m);
     }
+
+    free_arr(&m);
 }
