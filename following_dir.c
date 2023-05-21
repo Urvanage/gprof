@@ -10,6 +10,11 @@ typedef struct {
     int **visit;    // dp 역할
 }MAP;
 
+typedef struct{
+    int n;
+    int *arr;
+}List;
+
 int make_random_N(){
     int random = rand()%1000+100;
     return random;
@@ -85,16 +90,16 @@ void fill_random_map(MAP *m){
     init_arr(m);
 }
 
-/*void print_map(MAP *m){
-    printf("%d\n",getNfromMAP(m));
-    for(int i=1;i<=getNfromMAP(m)+1;i++){
-        for(int j=1;j<=getNfromMAP(m)+1;j++){
-            if(i<=getNfromMAP(m) && j<=getNfromMAP(m)) printf("%c ",m->map[i][j]);
-            else printf("%d ",m->cst[i][j]);
+void print_map(MAP *m){
+   int len = getNfromMAP(m);
+    for(int i=1;i<=len+1;i++){
+        for(int j=1;j<=len+1;j++){
+            if(i<=len && j<=len) printf("%c ",m->map[i][j]);
+            else if(i!=len+1 || j!=len+1) printf("%d ",m->cst[i][j]);
         }
         printf("\n");
     }
-}*/
+}
 
 void update(int x,int y, int num, MAP *m){
     int len = getNfromMAP(m);
@@ -166,9 +171,10 @@ void count_total(long long int* total, MAP *m){
         *total = *total + m->cst[len+1][j]*m->visit[len+1][j]; 
     }
     return;
+    printf("%lld\n",*total);
 }
 
-void solution(MAP *m,int* total){
+void solution(MAP *m,long long int* total){
 
     int len = getNfromMAP(m);
     init_visit(m);
@@ -182,11 +188,10 @@ void solution(MAP *m,int* total){
         }
     }
 
-    long long int *total;
     *total = 0;
 
     count_total(total,m);
-    printf("%lld\n",*total);
+
 }
 
 void changedir(int x,int y,MAP *m){
@@ -195,22 +200,71 @@ void changedir(int x,int y,MAP *m){
     else m->map[x][y] = 'D'; 
 }
 
+void insert(List* list, MAP * m){
+    int len = getNfromMAP(m);
+    list->arr = (int*)malloc(sizeof(int)*(len*2));
+    list->n = 0;
+
+    for(int i=1;i<=len+1;i++){
+        list->arr[(list->n)++] = m->visit[i][len+1]*m->cst[i][len+1];
+    }
+    
+    for(int j=1;j<=len+1;j++){
+        list->arr[(list->n)++] = m->visit[len+1][j]*m->cst[len+1][j];
+    }
+}
+
+int getNfromList(List *list){
+    return list->n;
+}
+
+void sortList(List *list){
+    int len = getNfromList(list);
+    for(int i=0;i<len-1;i++){
+        for(int j=i+1;j<len;j++){
+            if(list->arr[i] >list->arr[j]){
+                int tmp = list->arr[j];
+                list->arr[j] = list->arr[i];
+                list->arr[i] = tmp;
+            }
+        }
+    }
+}
+
+void print_list (List *list){
+    int len = getNfromList(list);
+    for(int i=0;i<len;i++){
+        printf("%lld ",list->arr[i]);
+    }
+}
+
 int main(){
     srand(time(NULL));
     MAP m;
+    List list;
     long long int total = 0;
 
     fill_random_map(&m);
 
+    /*
     solution(&m,&total);
 
     int Q = chooseint()+200;
 
     for(int i=0;i<Q;i++){
         int x = chooseint()%m.n+1,y = chooseint()%m.n+1; 
+        update(x,y,-m.visit[x][y],&m);
         changedir(x,y,&m);
-        solution(&m);
+        update(x,y,m.visit[x][y],&m);
+        count_total(&total,&m);
     }
+
+    print_map(&m);
+  */  
+    insert(&list,&m);
+    sortList(&list);
+
+    print_list(&list);
 
     free_arr(&m);
 }
